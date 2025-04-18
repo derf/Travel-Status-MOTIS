@@ -1,0 +1,4 @@
+Travel::Status::MOTIS 0.01 - Mon Apr 07 2025
+
+    * Initial release
+    * Supports stop board requests, trip details, and stop search
