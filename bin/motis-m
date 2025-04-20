@@ -399,17 +399,17 @@ __END__
 
 =head1 NAME
 
-motis - An interface to the MOTIS routing services
+motis-m - Interface to MOTIS public transit services
 
 =head1 SYNOPSIS
 
-B<motis> [B<-s> I<service>] [B<-d> I<DD.MM.>] [B<-t> I<HH:MM>] [B<-i>] [I<opt>] I<station>
+B<motis-m> [B<-s> I<service>] [B<-d> I<DD.MM.>] [B<-t> I<HH:MM>] [B<-i>] [I<opt>] I<station>
 
-B<motis> [B<-s> I<service>] [I<opt>] I<station>
+B<motis-m> [B<-s> I<service>] [I<opt>] I<station>
 
-B<motis> [B<-s> I<service>] I<trip_id>
+B<motis-m> [B<-s> I<service>] I<trip_id>
 
-B<motis> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
+B<motis-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
@@ -417,7 +417,7 @@ version 0.01
 
 =head1 DESCRIPTION
 
-B<motis> is an interface to MOTIS routing services. It can serve as an
+B<motis-m> is an interface to MOTIS routing services. It can serve as an
 arrival/departure board, request details about a specific trip, and
 look up public transport stops by name or geolocation. The operating
 mode depends on the contents of its non-option argument.
@@ -425,7 +425,7 @@ mode depends on the contents of its non-option argument.
 =head2 Departure Board (I<stop>)
 
 Show departures at I<stop>. I<stop> may be given as a stop name or
-stop id. For each departure, B<motis> shows
+stop id. For each departure, B<motis-m> shows
 
 =over
 
@@ -474,7 +474,7 @@ Default: now.
 
 Show trip id for each listed arrival/departure.
 These can be used to obtain details on individual trips with subsequent
-B<motis> invocations.
+B<motis-m> invocations.
 
 =item B<-m>, B<--modes-of-transit> I<mot1>[,I<mot2>,...] (departure board)
 
@@ -534,19 +534,20 @@ None.
 
 =over
 
-This module is mainly to debug the Travel::Status::MOTIS(3pm) module designed
-for use in travelynx (L<https://finalrewind.org/projects/travelynx/>) and as
-such might not contain functionality needed otherwise.
+Currently, this script is mainly intended as a debugging aid for the
+Travel::Status::MOTIS(3pm) module, which is in turn designed for use in
+travelynx (L<https://finalrewind.org/projects/travelynx/>). It may not
+provide functionality needed for use as a proper CLI public transit client.
 
 =back
 
 =head1 AUTHOR
 
-Copyright (C) networkException E<lt>git@nwex.deE<gt>
+Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
 
-Based on Travel::Status::DE::DBRIS
+Copyright (C) 2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
-Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Based on Travel::Status::DE::DBRIS, which is (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
