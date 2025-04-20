@@ -36,6 +36,6 @@ Module::Build->new(
 	sign         => 1,
 	meta_merge   => {
 		resources =>
-		  { repository => '' }
+		  { repository => 'https://github.com/derf/Travel-Status-MOTIS' }
 	},
 )->create_build_script();
