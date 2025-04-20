@@ -14,14 +14,15 @@ my $json = JSON->new->utf8;
 sub load_instance {
 	my ( $path, %opt ) = @_;
 
-	my $data = $json->decode( scalar read_file("ext/transport-apis/data/${path}.json") );
+	my $data = $json->decode(
+		scalar read_file("ext/transport-apis/data/${path}.json") );
 	my %ret = (
-		name       => $data->{name} =~ s{ *[(][^)]+[)]}{}r,
-		license    => $data->{attribution}{license},
-		homepage   => $data->{attribution}{homepage},
-		languages  => $data->{supportedLanguages},
-		endpoint   => $data->{options}{endpoint},
-		coverage => {
+		name      => $data->{name} =~ s{ *[(][^)]+[)]}{}r,
+		license   => $data->{attribution}{license},
+		homepage  => $data->{attribution}{homepage},
+		languages => $data->{supportedLanguages},
+		endpoint  => $data->{options}{endpoint},
+		coverage  => {
 			area    => $data->{coverage}{realtimeCoverage}{area},
 			regions => $data->{coverage}{realtimeCoverage}{region} // []
 		},
@@ -80,12 +81,8 @@ sub load_instance {
 }
 
 my %motis_instance = (
-	RNV => {
-		load_instance('de/rnv-motis')
-	},
-	transitous => {
-		load_instance('un/transitous')
-	},
+	RNV        => { load_instance('de/rnv-motis') },
+	transitous => { load_instance('un/transitous') },
 );
 
 my $perlobj = Data::Dumper->new( [ \%motis_instance ], ['motis_instance'] );

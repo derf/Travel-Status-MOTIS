@@ -25,8 +25,11 @@ my $cache;
 my ( $list_services, $service );
 my ( $json_output, $raw_json_output, $with_polyline );
 
-my %known_mode_of_transit = map { $_ => 1 }
-  (qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL));
+my %known_mode_of_transit
+  = map { $_ => 1 }
+  (
+	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+  );
 
 binmode( STDOUT, ':encoding(utf-8)' );
 for my $arg (@ARGV) {
@@ -47,13 +50,13 @@ GetOptions(
 	'i|show-trip-ids'      => \$show_trip_ids,
 	'm|modes-of-transit=s' => \$modes_of_transit,
 	't|time=s'             => \$time,
-    's|service=s'          => \$service,
+	's|service=s'          => \$service,
 	'V|version'            => \&show_version,
 	'cache!'               => \$use_cache,
 	'devmode'              => \$developer_mode,
 	'json'                 => \$json_output,
 	'raw-json'             => \$raw_json_output,
-    'list'                 => \$list_services,
+	'list'                 => \$list_services,
 ) or show_help(1);
 
 if ($list_services) {
@@ -65,8 +68,7 @@ if ($list_services) {
 	for my $service ( Travel::Status::MOTIS::get_services() ) {
 		printf(
 			"%-40s  %-14s %-15s\n",
-			$service->{name},
-			$service->{shortname},
+			$service->{name}, $service->{shortname},
 			join( q{ }, @{ $service->{languages} // [] } ),
 		);
 	}
@@ -77,9 +79,10 @@ if ($list_services) {
 $service //= 'transitous';
 
 if ($use_cache) {
-	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" ) . '/Travel-Status-MOTIS';
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-MOTIS';
 
-    eval {
+	eval {
 		require Cache::File;
 
 		$cache = Cache::File->new(
@@ -94,7 +97,7 @@ if ($use_cache) {
 	}
 }
 
-my ( $input ) = @ARGV;
+my ($input) = @ARGV;
 
 if ( not $input ) {
 	show_help(1);
@@ -102,7 +105,7 @@ if ( not $input ) {
 
 my %opt = (
 	cache          => $cache,
-    service        => $service,
+	service        => $service,
 	developer_mode => $developer_mode,
 );
 
@@ -112,20 +115,23 @@ if ( $input =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
 		lon => $+{lon},
 	};
 }
+
 # Format: yyyymmdd_hh:mm_feed_id
 elsif ( $input =~ m{^[0-9]{8}_[0-9]{2}:[0-9]{2}_} ) {
 	$opt{trip_id} = $input;
 }
+
 # Format: feed_id
 elsif ( $input =~ m{_} ) {
 	$opt{stop_id} = $input;
 }
 else {
-    $opt{stops_by_query} = $input;
+	$opt{stops_by_query} = $input;
 
 	my $status = Travel::Status::MOTIS->new(%opt);
 	if ( my $err = $status->errstr ) {
-		say STDERR "Request error while looking up '$opt{stops_by_query}': ${err}";
+		say STDERR
+		  "Request error while looking up '$opt{stops_by_query}': ${err}";
 		exit 2;
 	}
 
@@ -190,7 +196,8 @@ if ( $date or $time ) {
 if ( $modes_of_transit and $modes_of_transit eq 'help' ) {
 	say "Supported modes of transmit (-m / --modes-of-transit):";
 	for my $mot (
-		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL))
+		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+	  )
 	{
 		say $mot;
 	}
@@ -199,6 +206,7 @@ if ( $modes_of_transit and $modes_of_transit eq 'help' ) {
 }
 
 if ($modes_of_transit) {
+
 	# Passing unknown MOTs to the backend results in HTTP 422 Unprocessable Entity
 	my @mots = split( qr{, *}, $modes_of_transit );
 
@@ -274,31 +282,39 @@ if ($json_output) {
 
 if ( $opt{stop_id} ) {
 	my $max_route_name = max map { length( $_->route_name ) } $status->results;
-	my $max_headsign = max map { length( $_->headsign // q{} ) } $status->results;
-	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) } $status->results;
-	my $max_track = max map { length( $_->stopover->track // $_->stopover->scheduled_track // q{} ) } $status->results;
+	my $max_headsign
+	  = max map { length( $_->headsign // q{} ) } $status->results;
+	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) }
+	  $status->results;
+	my $max_track = max map {
+		length( $_->stopover->track // $_->stopover->scheduled_track // q{} )
+	} $status->results;
 
 	$max_delay += 1;
 
 	my @results = map { $_->[1] }
 	  sort { $a->[0] <=> $b->[0] }
-	  map { [ ( $_->stopover->departure // $_->stopover->arrival )->epoch, $_ ] } $status->results;
+	  map {
+		[ ( $_->stopover->departure // $_->stopover->arrival )->epoch, $_ ]
+	  } $status->results;
 
-    printf("%s\n\n", $results[0]->stopover->stop->name);
+	printf( "%s\n\n", $results[0]->stopover->stop->name );
 
 	for my $result (@results) {
 		printf(
 			"%s  %s  %${max_route_name}s  %${max_headsign}s  %${max_track}s\n",
-			$result->is_cancelled ? '--:--' : $result->stopover->departure->strftime('%H:%M'),
-			$result->stopover->departure_delay
-			? sprintf( "(%+${max_delay}d)", $result->stopover->departure_delay )
+			$result->is_cancelled ? '--:--'
+			: $result->stopover->departure->strftime('%H:%M'),
+			$result->stopover->departure_delay ? sprintf(
+				"(%+${max_delay}d)", $result->stopover->departure_delay
+			  )
 			: q{ } x ( $max_delay + 2 ),
 			$result->route_name,
 			$result->headsign // q{???},
 			$result->stopover->track // q{}
 		);
 
-		if ( $show_trip_ids ) {
+		if ($show_trip_ids) {
 			say $result->id;
 		}
 	}
@@ -308,7 +324,8 @@ elsif ( $opt{trip_id} ) {
 
 	my $max_name  = max map { length( $_->stop->name ) } $trip->stopovers;
 	my $max_track = max map { length( $_->track // q{} ) } $trip->stopovers;
-	my $max_delay = max map { $_->delay ? length( $_->delay ) + 3 : 0 } $trip->stopovers;
+	my $max_delay
+	  = max map { $_->delay ? length( $_->delay ) + 3 : 0 } $trip->stopovers;
 
 	my $mark_stop = 0;
 	my $now       = DateTime->now;
@@ -320,12 +337,14 @@ elsif ( $opt{trip_id} ) {
 			not $stop->is_cancelled
 			and (  $stop->departure and $now <= $stop->departure
 				or $stop->arrival and $now <= $stop->arrival )
-		) {
+		  )
+		{
 			$mark_stop = $stop;
 		}
 	}
 
-	printf( "%s am %s\n\n", $trip->route_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
+	printf( "%s am %s\n\n",
+		$trip->route_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
 
 	for my $stop ( $trip->stopovers ) {
 		if ( $stop == $mark_stop ) {
@@ -351,8 +370,10 @@ elsif ( $opt{trip_id} ) {
 			print('             ');
 		}
 
-		printf( " %${max_delay}s", format_delay( $stop->delay, $max_delay - 3 ) );
-		printf( "  %-${max_name}s  %${max_track}s\n", $stop->stop->name, $stop->track // q{} );
+		printf( " %${max_delay}s",
+			format_delay( $stop->delay, $max_delay - 3 ) );
+		printf( "  %-${max_name}s  %${max_track}s\n",
+			$stop->stop->name, $stop->track // q{} );
 
 		if ( $stop == $mark_stop ) {
 			print($output_reset);

@@ -48,9 +48,8 @@ sub new {
 	my $user_agent = $conf{user_agent};
 
 	if ( not $user_agent ) {
-		$user_agent = LWP::UserAgent->new(%{
-			$conf{lwp_options} // { timeout => 10 }
-		});
+		$user_agent
+		  = LWP::UserAgent->new( %{ $conf{lwp_options} // { timeout => 10 } } );
 	}
 
 	my $self = {
@@ -68,7 +67,7 @@ sub new {
 	if ( my $stop_id = $conf{stop_id} ) {
 		my $timestamp = $conf{timestamp} // DateTime->now;
 
-		my @modes_of_transit = ( qw(TRANSIT) );
+		my @modes_of_transit = (qw(TRANSIT));
 
 		if ( $conf{modes_of_transit} ) {
 			@modes_of_transit = @{ $conf{modes_of_transit} // [] };
@@ -76,7 +75,7 @@ sub new {
 
 		$request_url->path('api/v1/stoptimes');
 		$request_url->query_form(
-			time   => DateTime::Format::ISO8601->format_datetime( $timestamp ),
+			time   => DateTime::Format::ISO8601->format_datetime($timestamp),
 			stopId => $stop_id,
 			n      => $conf{results} // 10,
 			mode   => join( ',', @modes_of_transit ),
@@ -105,12 +104,15 @@ sub new {
 		);
 	}
 	else {
-		confess('stop_id / trip_id / stops_by_coordinate / stops_by_query must be specified');
+		confess(
+'stop_id / trip_id / stops_by_coordinate / stops_by_query must be specified'
+		);
 	}
 
 	my $json = $self->{json} = JSON->new->utf8;
 
-	$request_url = $request_url->abs( $motis_instance->{$service}{endpoint} )->as_string;
+	$request_url
+	  = $request_url->abs( $motis_instance->{$service}{endpoint} )->as_string;
 
 	if ( $conf{async} ) {
 		$self->{request_url} = $request_url;
@@ -157,13 +159,15 @@ sub new_p {
 
 	my $promise = $conf{promise}->new;
 
-	if (not($conf{stop_id}
-		 or $conf{trip_id}
-		 or $conf{stops_by_coordinate}
-		 or $conf{stops_by_query}
-	)) {
+	if (
+		not(   $conf{stop_id}
+			or $conf{trip_id}
+			or $conf{stops_by_coordinate}
+			or $conf{stops_by_query} )
+	  )
+	{
 		return $promise->reject(
-			'stop_id / trip_id / stops_by_coordinate / stops_by_query flag must be passed'
+'stop_id / trip_id / stops_by_coordinate / stops_by_query flag must be passed'
 		);
 	}
 
@@ -277,7 +281,8 @@ sub get_with_cache_p {
 		sub {
 			my ($tx) = @_;
 			if ( my $err = $tx->error ) {
-				$promise->reject("GET $url returned HTTP $err->{code} $err->{message}");
+				$promise->reject(
+					"GET $url returned HTTP $err->{code} $err->{message}");
 
 				return;
 			}
@@ -305,14 +310,17 @@ sub get_with_cache_p {
 sub parse_trip {
 	my ( $self, %opt ) = @_;
 
-	$self->{result} = Travel::Status::MOTIS::Trip->new( json => $self->{raw_json} );
+	$self->{result}
+	  = Travel::Status::MOTIS::Trip->new( json => $self->{raw_json} );
 }
 
 sub parse_stops_by {
 	my ($self) = @_;
 
 	@{ $self->{results} } = map {
-		$_->{type} eq 'STOP' ? Travel::Status::MOTIS::Stop->from_match( json => $_ ) : ()
+		$_->{type} eq 'STOP'
+		  ? Travel::Status::MOTIS::Stop->from_match( json => $_ )
+		  : ()
 	} @{ $self->{raw_json} // [] };
 
 	return $self;
@@ -321,9 +329,9 @@ sub parse_stops_by {
 sub parse_trips_at_stopover {
 	my ($self) = @_;
 
-	@{ $self->{results} } = map {
-		Travel::Status::MOTIS::TripAtStopover->new( json => $_ )
-	} @{ $self->{raw_json}{stopTimes} // [] };
+	@{ $self->{results} }
+	  = map { Travel::Status::MOTIS::TripAtStopover->new( json => $_ ) }
+	  @{ $self->{raw_json}{stopTimes} // [] };
 
 	return $self;
 }

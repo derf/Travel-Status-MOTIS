@@ -13,25 +13,27 @@ use Travel::Status::MOTIS::Polyline qw(decode_polyline);
 
 our $VERSION = '0.01';
 
-Travel::Status::MOTIS::Trip->mk_ro_accessors(qw(
-	id
-	mode
-	agency
-	route_name
-	route_color
-	headsign
+Travel::Status::MOTIS::Trip->mk_ro_accessors(
+	qw(
+	  id
+	  mode
+	  agency
+	  route_name
+	  route_color
+	  headsign
 
-	is_realtime
-	is_cancelled
+	  is_realtime
+	  is_cancelled
 
-	arrival
-	scheduled_arrival
-	realtime_arrival
+	  arrival
+	  scheduled_arrival
+	  realtime_arrival
 
-	departure
-	scheduled_departure
-	realtime_departure
-));
+	  departure
+	  scheduled_departure
+	  realtime_departure
+	)
+);
 
 sub new {
 	my ( $obj, %opt ) = @_;
@@ -39,35 +41,41 @@ sub new {
 	my $json = $opt{json}{legs}[0];
 
 	my $ref = {
-		id            => $json->{tripId},
-		mode          => $json->{mode},
-		agency        => $json->{agencyName},
-		route_name    => $json->{routeShortName},
-		route_color   => $json->{routeColor},
-		headsign      => $json->{headsign},
+		id          => $json->{tripId},
+		mode        => $json->{mode},
+		agency      => $json->{agencyName},
+		route_name  => $json->{routeShortName},
+		route_color => $json->{routeColor},
+		headsign    => $json->{headsign},
 
-		is_cancelled  => $json->{cancelled},
-		is_realtime   => $json->{realTime},
+		is_cancelled => $json->{cancelled},
+		is_realtime  => $json->{realTime},
 
-		raw_stopovers => [ $json->{from}, @{ $json->{intermediateStops} }, $json->{to} ],
-		raw_polyline  => $json->{legGeometry}->{points},
+		raw_stopovers =>
+		  [ $json->{from}, @{ $json->{intermediateStops} }, $json->{to} ],
+		raw_polyline => $json->{legGeometry}->{points},
 	};
 
-	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime( $json->{scheduledStartTime} );
+	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
+		$json->{scheduledStartTime} );
 	$ref->{scheduled_departure}->set_time_zone('local');
 
 	if ( $json->{realTime} ) {
-		$ref->{realtime_departure} = DateTime::Format::ISO8601->parse_datetime( $json->{startTime} );
+		$ref->{realtime_departure}
+		  = DateTime::Format::ISO8601->parse_datetime( $json->{startTime} );
 		$ref->{realtime_departure}->set_time_zone('local');
 	}
 
-	$ref->{departure} = $ref->{realtime_departure} // $ref->{scheduled_departure};
+	$ref->{departure} = $ref->{realtime_departure}
+	  // $ref->{scheduled_departure};
 
-	$ref->{scheduled_arrival} = DateTime::Format::ISO8601->parse_datetime( $json->{scheduledEndTime} );
+	$ref->{scheduled_arrival}
+	  = DateTime::Format::ISO8601->parse_datetime( $json->{scheduledEndTime} );
 	$ref->{scheduled_arrival}->set_time_zone('local');
 
 	if ( $json->{realTime} ) {
-		$ref->{realtime_arrival} = DateTime::Format::ISO8601->parse_datetime( $json->{endTime} );
+		$ref->{realtime_arrival}
+		  = DateTime::Format::ISO8601->parse_datetime( $json->{endTime} );
 		$ref->{realtime_arrival}->set_time_zone('local');
 	}
 
@@ -106,16 +114,14 @@ sub polyline {
 
 			for my $polyline_index ( 0 .. $#{$polyline} ) {
 				my $coordinate = $polyline->[$polyline_index];
-				my $distance = $gis_distance->distance_metal(
-					$stop->{lat},
-					$stop->{lon},
-					$coordinate->{lat},
-					$coordinate->{lon},
+				my $distance   = $gis_distance->distance_metal(
+					$stop->{lat},       $stop->{lon},
+					$coordinate->{lat}, $coordinate->{lon},
 				);
 
 				if ( not $minimum_distances{ $stop->id }
-					 or $minimum_distances{ $stop->id }{distance} > $distance
-				) {
+					or $minimum_distances{ $stop->id }{distance} > $distance )
+				{
 					$minimum_distances{ $stop->id } = {
 						distance => $distance,
 						index    => $polyline_index,
@@ -128,7 +134,8 @@ sub polyline {
 			my $stop = $stopover->stop;
 
 			if ( $minimum_distances{ $stop->id } ) {
-				$polyline->[ $minimum_distances{ $stop->id }{index} ]{stop} = $stop;
+				$polyline->[ $minimum_distances{ $stop->id }{index} ]{stop}
+				  = $stop;
 			}
 		}
 	}
@@ -147,7 +154,7 @@ sub stopovers {
 
 	@{ $self->{stopovers} } = map {
 		Travel::Status::MOTIS::Stopover->new(
-			json => $_,
+			json     => $_,
 			realtime => $self->{is_realtime}
 		)
 	} ( @{ $self->{raw_stopovers} // [] } );
@@ -166,7 +173,8 @@ sub TO_JSON {
 
 	my $ret = { %{$self} };
 
-	for my $timestamp_key (qw(
+	for my $timestamp_key (
+		qw(
 		arrival
 		scheduled_arrival
 		realtime_arrival
@@ -174,7 +182,9 @@ sub TO_JSON {
 		departure
 		scheduled_departure
 		realtime_departure
-	)) {
+		)
+	  )
+	{
 		if ( $ret->{$timestamp_key} ) {
 			$ret->{$timestamp_key} = $ret->{$timestamp_key}->epoch;
 		}
