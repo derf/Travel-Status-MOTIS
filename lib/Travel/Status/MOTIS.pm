@@ -31,6 +31,7 @@ our $VERSION = '0.01';
 # Thanks to Jannis R / @derhuerst and all contributors for maintaining these.
 my $motis_instance = Travel::Status::MOTIS::Services::get_service_ref();
 
+# }}}
 # {{{ Constructors
 
 sub new {
