@@ -165,8 +165,8 @@ sub stopovers {
 sub TO_JSON {
 	my ($self) = @_;
 
-	# transform raw_route into route (lazy accessor)
-	$self->route;
+	# transform raw_stopovers into stopovers (lazy accessor)
+	$self->stopovers;
 
 	# transform raw_polyline into polyline (lazy accessor)
 	$self->polyline;

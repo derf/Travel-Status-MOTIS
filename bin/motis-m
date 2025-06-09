@@ -270,7 +270,7 @@ if ($raw_json_output) {
 }
 
 if ($json_output) {
-	if ( $opt{journey} ) {
+	if ( $opt{trip_id} ) {
 		say JSON->new->convert_blessed->encode( $status->result );
 	}
 	else {
