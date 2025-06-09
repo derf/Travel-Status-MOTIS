@@ -53,7 +53,7 @@ sub new {
 
 		raw_stopovers =>
 		  [ $json->{from}, @{ $json->{intermediateStops} }, $json->{to} ],
-		raw_polyline => $json->{legGeometry}->{points},
+		raw_polyline => $json->{legGeometry},
 	};
 
 	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
