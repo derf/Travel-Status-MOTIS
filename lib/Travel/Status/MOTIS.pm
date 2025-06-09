@@ -83,7 +83,7 @@ sub new {
 		);
 	}
 	elsif ( my $trip_id = $conf{trip_id} ) {
-		$request_url->path('api/v1/trip');
+		$request_url->path('api/v2/trip');
 		$request_url->query_form(
 			tripId => $trip_id,
 		);
