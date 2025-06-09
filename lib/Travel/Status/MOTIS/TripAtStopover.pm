@@ -17,6 +17,7 @@ Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	  agency
 	  route_name
 	  route_color
+	  route_text_color
 	  headsign
 
 	  is_cancelled
@@ -32,12 +33,13 @@ sub new {
 	my $json = $opt{json};
 
 	my $ref = {
-		id          => $json->{tripId},
-		mode        => $json->{mode},
-		agency      => $json->{agencyName},
-		route_name  => $json->{routeShortName},
-		route_color => $json->{routeColor},
-		headsign    => $json->{headsign},
+		id               => $json->{tripId},
+		mode             => $json->{mode},
+		agency           => $json->{agencyName},
+		route_name       => $json->{routeShortName},
+		route_color      => $json->{routeColor},
+		route_text_color => $json->{routeTextColor},
+		headsign         => $json->{headsign},
 
 		is_cancelled => $json->{cancelled},
 		is_realtime  => $json->{realTime},
