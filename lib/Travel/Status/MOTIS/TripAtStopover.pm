@@ -29,7 +29,8 @@ Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $json = $opt{json};
+	my $json      = $opt{json};
+	my $time_zone = $opt{time_zone};
 
 	my $ref = {
 		id          => $json->{tripId},
@@ -48,6 +49,8 @@ sub new {
 			# NOTE: $json->{place}->{cancelled} isn't set, we just override this here.
 			cancelled => $json->{cancelled},
 			realtime  => $json->{realTime},
+
+			time_zone => $time_zone,
 		),
 	};
 
