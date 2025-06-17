@@ -40,6 +40,7 @@ sub new {
 	my ( $obj, %opt ) = @_;
 
 	my $json = $opt{json}{legs}[0];
+	my $time_zone = $opt{time_zone};
 
 	my $ref = {
 		id               => $json->{tripId},
@@ -56,16 +57,18 @@ sub new {
 		raw_stopovers =>
 		  [ $json->{from}, @{ $json->{intermediateStops} }, $json->{to} ],
 		raw_polyline => $json->{legGeometry},
+
+		time_zone    => $time_zone,
 	};
 
 	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
 		$json->{scheduledStartTime} );
-	$ref->{scheduled_departure}->set_time_zone('local');
+	$ref->{scheduled_departure}->set_time_zone( $time_zone );
 
 	if ( $json->{realTime} ) {
 		$ref->{realtime_departure}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{startTime} );
-		$ref->{realtime_departure}->set_time_zone('local');
+		$ref->{realtime_departure}->set_time_zone( $time_zone );
 	}
 
 	$ref->{departure} = $ref->{realtime_departure}
@@ -73,12 +76,12 @@ sub new {
 
 	$ref->{scheduled_arrival}
 	  = DateTime::Format::ISO8601->parse_datetime( $json->{scheduledEndTime} );
-	$ref->{scheduled_arrival}->set_time_zone('local');
+	$ref->{scheduled_arrival}->set_time_zone( $time_zone );
 
 	if ( $json->{realTime} ) {
 		$ref->{realtime_arrival}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{endTime} );
-		$ref->{realtime_arrival}->set_time_zone('local');
+		$ref->{realtime_arrival}->set_time_zone( $time_zone );
 	}
 
 	$ref->{arrival} = $ref->{realtime_arrival} // $ref->{scheduled_arrival};
@@ -156,8 +159,9 @@ sub stopovers {
 
 	@{ $self->{stopovers} } = map {
 		Travel::Status::MOTIS::Stopover->new(
-			json     => $_,
-			realtime => $self->{is_realtime}
+			json      => $_,
+			realtime  => $self->{is_realtime},
+			time_zone => $self->{time_zone},
 		)
 	} ( @{ $self->{raw_stopovers} // [] } );
 
