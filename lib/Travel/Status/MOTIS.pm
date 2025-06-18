@@ -59,7 +59,7 @@ sub new {
 		results        => [],
 		station        => $conf{station},
 		user_agent     => $user_agent,
-		time_zone      => 'local',
+		time_zone      => $conf{time_zone} // 'local',
 	};
 
 	bless( $self, $obj );
