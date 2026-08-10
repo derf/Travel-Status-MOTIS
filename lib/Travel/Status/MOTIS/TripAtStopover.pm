@@ -15,7 +15,7 @@ Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	  id
 	  mode
 	  agency
-	  route_name
+	  display_name
 	  route_color
 	  route_text_color
 	  headsign
@@ -37,7 +37,7 @@ sub new {
 		id               => $json->{tripId},
 		mode             => $json->{mode},
 		agency           => $json->{agencyName},
-		route_name       => $json->{routeShortName},
+		display_name     => $json->{displayName},
 		route_color      => $json->{routeColor},
 		route_text_color => $json->{routeTextColor},
 		headsign         => $json->{headsign},

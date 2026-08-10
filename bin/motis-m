@@ -28,7 +28,7 @@ my ( $json_output, $raw_json_output, $with_polyline );
 my %known_mode_of_transit
   = map { $_ => 1 }
   (
-	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL SUBURBAN ODM RIDE_SHARING FUNICULAR AERIAL_LIFT)
   );
 
 binmode( STDOUT, ':encoding(utf-8)' );
@@ -196,7 +196,7 @@ if ( $date or $time ) {
 if ( $modes_of_transit and $modes_of_transit eq 'help' ) {
 	say "Supported modes of transmit (-m / --modes-of-transit):";
 	for my $mot (
-		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL SUBURBAN ODM RIDE_SHARING FUNICULAR AERIAL_LIFT)
 	  )
 	{
 		say $mot;
@@ -281,7 +281,7 @@ if ($json_output) {
 }
 
 if ( $opt{stop_id} ) {
-	my $max_route_name = max map { length( $_->route_name ) } $status->results;
+	my $max_display_name = max map { length( $_->display_name ) } $status->results;
 	my $max_headsign
 	  = max map { length( $_->headsign // q{} ) } $status->results;
 	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) }
@@ -302,14 +302,14 @@ if ( $opt{stop_id} ) {
 
 	for my $result (@results) {
 		printf(
-			"%s  %s  %${max_route_name}s  %${max_headsign}s  %${max_track}s\n",
+			"%s  %s  %${max_display_name}s  %${max_headsign}s  %${max_track}s\n",
 			$result->is_cancelled ? '--:--'
 			: $result->stopover->departure->strftime('%H:%M'),
 			$result->stopover->departure_delay ? sprintf(
 				"(%+${max_delay}d)", $result->stopover->departure_delay
 			  )
 			: q{ } x ( $max_delay + 2 ),
-			$result->route_name,
+			$result->display_name,
 			$result->headsign // q{???},
 			$result->stopover->track // q{}
 		);
@@ -344,7 +344,7 @@ elsif ( $opt{trip_id} ) {
 	}
 
 	printf( "%s am %s\n\n",
-		$trip->route_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
+		$trip->display_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
 
 	for my $stop ( $trip->stopovers ) {
 		if ( $stop == $mark_stop ) {
