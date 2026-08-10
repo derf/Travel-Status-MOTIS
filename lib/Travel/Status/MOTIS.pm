@@ -145,6 +145,7 @@ sub new {
 
 	if ( $conf{stop_id} ) {
 		$self->parse_trips_at_stopover;
+		$self->parse_stop;
 	}
 	elsif ( $conf{trip_id} ) {
 		$self->parse_trip;
@@ -184,6 +185,7 @@ sub new_p {
 
 			if ( $conf{stop_id} ) {
 				$self->parse_trips_at_stopover;
+				$self->parse_stop;
 			}
 			elsif ( $conf{trip_id} ) {
 				$self->parse_trip;
@@ -339,6 +341,16 @@ sub parse_trips_at_stopover {
 			time_zone => $self->{time_zone},
 		)
 	} @{ $self->{raw_json}{stopTimes} // [] };
+
+	return $self;
+}
+
+sub parse_stop {
+	my ($self) = @_;
+
+	$self->{result} = Travel::Status::MOTIS::Stop->from_stopover(
+		json => $self->{raw_json}{place},
+	);
 
 	return $self;
 }
