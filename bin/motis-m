@@ -273,6 +273,12 @@ if ($json_output) {
 	if ( $opt{trip_id} ) {
 		say JSON->new->convert_blessed->encode( $status->result );
 	}
+	elsif ( $opt{stop_id} ) {
+		say JSON->new->convert_blessed->encode({
+			result  => $status->result,
+			results => [ $status->results ]
+		});
+	}
 	else {
 		say JSON->new->convert_blessed->encode( [ $status->results ] );
 	}
