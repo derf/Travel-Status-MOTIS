@@ -619,7 +619,7 @@ L<TBD>
 
 =head1 AUTHOR
 
-Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
+Copyright (C) 2025-2026 networkException E<lt>git@nwex.deE<gt>
 
 Based on Travel::Status::DE::DBRIS
 

@@ -567,11 +567,9 @@ provide functionality needed for use as a proper CLI public transit client.
 
 =head1 AUTHOR
 
-Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
+Copyright (C) 2025-2026 networkException E<lt>git@nwex.deE<gt>
 
-Copyright (C) 2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
-
-Based on Travel::Status::DE::DBRIS, which is (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2025-2026 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
