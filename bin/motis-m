@@ -126,6 +126,12 @@ elsif ( $input =~ m{_} ) {
 	$opt{stop_id} = $input;
 }
 else {
+
+	my $list_stops;
+	if ( $input =~ s{ ^ [?] }{}x ) {
+		$list_stops = 1;
+	}
+
 	$opt{stops_by_query} = $input;
 
 	my $status = Travel::Status::MOTIS->new(%opt);
@@ -138,14 +144,23 @@ else {
 	my $found;
 	for my $result ( $status->results ) {
 		if ( defined $result->id ) {
-			if ( lc( $result->name ) ne lc( $opt{stops_by_query} ) ) {
-				say $result->name;
+			if ($list_stops) {
+				printf( "%40s %s\n", $result->name, $result->id );
 			}
+			else {
+				if ( lc( $result->name ) ne lc( $opt{stops_by_query} ) ) {
+					say $result->name;
+				}
 
-			$opt{stop_id} = $result->id;
-			$found = 1;
-			last;
+				$opt{stop_id} = $result->id;
+				$found = 1;
+				last;
+			}
 		}
+	}
+
+	if ($list_stops) {
+		exit 0;
 	}
 
 	if ( not $found ) {
@@ -274,10 +289,12 @@ if ($json_output) {
 		say JSON->new->convert_blessed->encode( $status->result );
 	}
 	elsif ( $opt{stop_id} ) {
-		say JSON->new->convert_blessed->encode({
-			result  => $status->result,
-			results => [ $status->results ]
-		});
+		say JSON->new->convert_blessed->encode(
+			{
+				result  => $status->result,
+				results => [ $status->results ]
+			}
+		);
 	}
 	else {
 		say JSON->new->convert_blessed->encode( [ $status->results ] );
@@ -287,7 +304,8 @@ if ($json_output) {
 }
 
 if ( $opt{stop_id} ) {
-	my $max_display_name = max map { length( $_->display_name ) } $status->results;
+	my $max_display_name
+	  = max map { length( $_->display_name ) } $status->results;
 	my $max_headsign
 	  = max map { length( $_->headsign // q{} ) } $status->results;
 	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) }
@@ -308,7 +326,7 @@ if ( $opt{stop_id} ) {
 
 	for my $result (@results) {
 		printf(
-			"%s  %s  %${max_display_name}s  %${max_headsign}s  %${max_track}s\n",
+"%s  %s  %${max_display_name}s  %${max_headsign}s  %${max_track}s\n",
 			$result->is_cancelled ? '--:--'
 			: $result->stopover->departure->strftime('%H:%M'),
 			$result->stopover->departure_delay ? sprintf(
