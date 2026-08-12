@@ -185,7 +185,6 @@ Documentation is not available in this image. Please refer to the
 
 Mirrors of this repository are available at
 
-* [Chaosdorf](https://chaosdorf.de/git/derf/Travel-Status-MOTIS)
 * [Codeberg](https://codeberg.org/derf/Travel-Status-MOTIS/)
 * [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-MOTIS/)
 * [GitHub](https://github.com/derf/Travel-Status-MOTIS)
