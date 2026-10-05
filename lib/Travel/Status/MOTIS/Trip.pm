@@ -47,6 +47,7 @@ sub new {
 		mode             => $json->{mode},
 		agency           => $json->{agencyName},
 		display_name     => $json->{displayName},
+		trip_short_name  => $json->{tripShortName},
 		route_color      => $json->{routeColor},
 		route_text_color => $json->{routeTextColor},
 		headsign         => $json->{headsign},
