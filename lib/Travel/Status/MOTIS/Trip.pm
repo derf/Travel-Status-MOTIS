@@ -21,6 +21,7 @@ Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	  display_name
 	  route_color
 	  route_text_color
+	  trip_short_name
 	  headsign
 
 	  is_realtime
