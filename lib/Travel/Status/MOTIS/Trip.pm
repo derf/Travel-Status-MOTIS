@@ -19,6 +19,7 @@ Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	  mode
 	  agency
 	  display_name
+	  trip_short_name
 	  route_color
 	  route_text_color
 	  headsign
