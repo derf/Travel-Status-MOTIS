@@ -63,6 +63,13 @@ sub new {
 		time_zone => $time_zone,
 	};
 
+	# some trips encode the trip number both as tripShortName and as
+	# "line (trip number number)" in displayName
+	if ($ref->{display_name} and $ref->{trip_short_name}) {
+		my $trip_no = $ref->{trip_short_name} =~ s{ ^ 0 + }{}rx;
+		$ref->{display_name} =~ s{ [(] \Q$trip_no\E [)] }{}x;
+	}
+
 	$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
 		$json->{scheduledStartTime} );
 	$ref->{scheduled_departure}->set_time_zone($time_zone);
